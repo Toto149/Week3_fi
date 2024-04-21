@@ -1,5 +1,8 @@
 package computers;
 
+
+import java.util.List;
+
 public class ComputerTest {
 
     public static void main(String[] args){
@@ -20,6 +23,7 @@ public class ComputerTest {
         System.out.println();
         System.out.println("Computer Comprehensive New");
         System.out.println(computerComprehensive);
+        System.out.println(computerComprehensive.getBuyingPrice());
 
     }
 }

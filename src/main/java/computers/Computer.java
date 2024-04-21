@@ -1,8 +1,13 @@
 package computers;
 
+//Ich nutze Lombok welches durch eine Annotation die Getter, Setter, etc. automatisch generieren lassen kann.
+//Dokumentation der verschiedenen Annotationen: https://projectlombok.org/features/
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.HashMap;
 
 @Getter
 @Setter
@@ -17,18 +22,25 @@ public class Computer{
     private ComputerType computerType;
     private GPU gpu;
     private boolean hasOSPreinstalled;
-
+    private static HashMap<String,BigDecimal> pricePerComponentMap = new HashMap<>() {{
+        put("ram", BigDecimal.valueOf(1.99));
+        put("processor", BigDecimal.valueOf(0.1));
+        put("screen", BigDecimal.valueOf(9.99));
+    }};
+    private BigDecimal buyingPrice;
+    private BigDecimal sellingPrice;
 
     public Computer(){
-
+        sellingPrice = BigDecimal.valueOf(0);
     }
 
     public Computer(String manufacturerName, int screenSizeInInch, boolean hasOSPreinstalled){
         this.manufacturerName = manufacturerName;
         this.screenSizeInInch = screenSizeInInch;
         this.hasOSPreinstalled = hasOSPreinstalled;
+        sellingPrice = BigDecimal.valueOf(0);
     }
-
+    //Constructor mit mehr als 7 Parametern anscheinend nicht so gut. SonarLint beschwert sich.
     public Computer(String manufacturerName,
                     int processorClockSpeedInMHz,
                     int ramSizeInGB,
@@ -51,6 +63,11 @@ public class Computer{
             this.gpu = null;
         }
         this.hasOSPreinstalled = hasOSPreinstalled;
+        buyingPrice = BigDecimal.valueOf(ramSizeInGB).multiply(  pricePerComponentMap.get("ram"))
+                .add(BigDecimal.valueOf(processorClockSpeedInMHz).multiply(pricePerComponentMap.get("processor")))
+                .add(BigDecimal.valueOf(screenSizeInInch).multiply(pricePerComponentMap.get("screen")))
+                .add(gpu.getPriceInEuro());
+        sellingPrice = buyingPrice.multiply(BigDecimal.valueOf(1.2)).setScale(2, RoundingMode.HALF_UP);
     }
 
     @Override
@@ -63,7 +80,8 @@ public class Computer{
                 "Screen size in inches:  " + (this.screenSizeInInch == 0 ? "Screen size not given" : this.screenSizeInInch+ "\"") + "\n" +
                 "Computer type:          " + (this.computerType==null ? "Computer type not given" : this.computerType.toString()) + "\n" +
                 "Graphic Card:           " + (this.gpu == null ? "Graphic Card not given" : this.gpu.toString()) + "\n" +
-                "Operating System:       " + (this.hasOSPreinstalled ? "Has OS preinstalled" : "Has not OS preinstalled");
+                "Operating System:       " + (this.hasOSPreinstalled ? "Has OS preinstalled" : "Has not OS preinstalled") + "\n" +
+                "Selling Price:          " + (this.sellingPrice.equals(BigDecimal.valueOf(0)) ? "Has no price specified" : this.sellingPrice +"€");
     }
 
 
